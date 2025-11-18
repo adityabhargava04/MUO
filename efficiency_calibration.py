@@ -27,7 +27,7 @@ def compute_relative_efficiency(dt_us, bins=200, dt_range=(0, 40)):
     return centers, efficiency, hist, plateau_level
 
 
-def fit_efficiency_spline(dt_centers, efficiency, smooth_factor=1e4):
+def fit_efficiency_spline(dt_centers, efficiency, smooth_factor=1):
     mask = np.isfinite(efficiency)
     x = dt_centers[mask]
     y = efficiency[mask]
