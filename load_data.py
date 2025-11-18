@@ -4,28 +4,17 @@ import re
 
 def load_digitizer(path):
     """
-    Loads a 12-column digitizer text file and automatically skips all header lines.
-    Header is detected by searching for the first line starting with a number.
-    Returns a dictionary with fields for t1, A1, w1, t2, A2, w2, and dt.
+    Loads a 12-column digitizer text file by skipping the standard header lines.
+    Assumes fixed format:
+    - line 0: metadata
+    - line 1: settings
+    - line 2: blank
+    - line 3: column headers
+    - line 4+: numeric data
     """
 
-    # Step 1: detect where numeric data begins
-    start_row = None
-    num_pattern = re.compile(r"^\s*[-+]?\d")   # matches a line starting with a number
+    raw = np.loadtxt(path, skiprows=4)  # skip metadata + header
 
-    with open(path, "r") as f:
-        for i, line in enumerate(f):
-            if num_pattern.match(line):
-                start_row = i
-                break
-
-    if start_row is None:
-        raise ValueError("Could not find numeric data in file: " + path)
-
-    # Step 2: load only the actual numeric part
-    raw = np.loadtxt(path, skiprows=start_row)
-
-    # Step 3: construct data dictionary
     data = {
         # Channel 0
         "t1": raw[:,0],
@@ -44,13 +33,11 @@ def load_digitizer(path):
         "w2_ch1": raw[:,11],
     }
 
-    # Step 4: compute dt and dt_us
     dt = data["t2"] - data["t1"]
     data["dt"] = dt
     data["dt_us"] = dt * 1e6
 
-    # Basic “valid dt” mask
-    data["valid_dt_mask"] = (dt > 0) & (dt < 1e-4)  # up to 100 µs
+    data["valid_dt_mask"] = (dt > 0) & (dt < 1e-4)
 
     return data
 
