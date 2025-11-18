@@ -74,7 +74,7 @@ def main():
     print(f"b = {b:.6f}     (scale factor)")
 
     # save calibration constants for later scripts
-    np.save("time_calibration_coeffs.npy", np.array([a, b]))
+    np.save("./data/time_calibration_coeffs.npy", np.array([a, b]))
 
     # plot
     t_fit = np.linspace(min(true_vals)-1, max(true_vals)+1, 200)
